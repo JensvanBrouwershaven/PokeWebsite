@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, LogOut } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, LogOut, Camera, Upload } from 'lucide-react';
 
 const Profile = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -7,6 +7,7 @@ const Profile = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
   
   // Form states
   const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -18,23 +19,65 @@ const Profile = () => {
   });
   const [errors, setErrors] = useState({});
 
-  // In your actual project, replace this with localStorage
-  const [users, setUsers] = useState([
-    { id: 1, name: 'Demo User', email: 'demo@pokemon.com', password: 'demo123' }
-  ]);
+  // Initialize with demo user but check localStorage first
+  const [users, setUsers] = useState([]);
 
-  // Check if user is logged in on component mount
+  // Load data from localStorage on component mount
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-      setIsLoggedIn(true);
-    }
+    // Load saved users from localStorage
+    const savedUsers = localStorage.getItem('pokemonUsers');
+    let loadedUsers = [];
     
-    // Load existing users
-    const savedUsers = localStorage.getItem('users');
     if (savedUsers) {
-      setUsers(JSON.parse(savedUsers));
+      try {
+        loadedUsers = JSON.parse(savedUsers);
+        console.log('Loaded users from localStorage:', loadedUsers);
+        setUsers(loadedUsers);
+      } catch (error) {
+        console.error('Error parsing saved users:', error);
+        // If there's an error, initialize with demo user
+        loadedUsers = [{ 
+          id: 1, 
+          name: 'Demo User', 
+          email: 'demo@pokemon.com', 
+          password: 'demo123',
+          profilePicture: null
+        }];
+        setUsers(loadedUsers);
+        localStorage.setItem('pokemonUsers', JSON.stringify(loadedUsers));
+      }
+    } else {
+      // First time loading - create demo user
+      loadedUsers = [{ 
+        id: 1, 
+        name: 'Demo User', 
+        email: 'demo@pokemon.com', 
+        password: 'demo123',
+        profilePicture: null
+      }];
+      setUsers(loadedUsers);
+      localStorage.setItem('pokemonUsers', JSON.stringify(loadedUsers));
+    }
+
+    // Check if user is logged in (only after users are loaded)
+    const savedUser = localStorage.getItem('pokemonCurrentUser');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        // Verify the user still exists in the users array
+        const userExists = loadedUsers.find(u => u.id === parsedUser.id && u.email === parsedUser.email);
+        if (userExists) {
+          setCurrentUser(parsedUser);
+          setIsLoggedIn(true);
+          console.log('Auto-logged in user:', parsedUser);
+        } else {
+          // User doesn't exist anymore, clear the session
+          localStorage.removeItem('pokemonCurrentUser');
+        }
+      } catch (error) {
+        console.error('Error parsing current user:', error);
+        localStorage.removeItem('pokemonCurrentUser');
+      }
     }
   }, []);
 
@@ -53,7 +96,6 @@ const Profile = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Check if user exists
       const user = users.find(u => u.email === loginData.email && u.password === loginData.password);
       
       if (user) {
@@ -61,8 +103,8 @@ const Profile = () => {
         setIsLoggedIn(true);
         setLoginData({ email: '', password: '' });
         
-        // Save to localStorage
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        // Save current user to localStorage
+        localStorage.setItem('pokemonCurrentUser', JSON.stringify(user));
       } else {
         setErrors({ general: 'Invalid email or password' });
       }
@@ -82,7 +124,6 @@ const Profile = () => {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
-    // Check if email already exists
     if (users.find(u => u.email === registerData.email)) {
       newErrors.email = 'Email already registered';
     }
@@ -90,11 +131,13 @@ const Profile = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
+      const maxId = users.reduce((max, user) => user.id > max ? user.id : max, 0);
       const newUser = {
-        id: users.length + 1,
+         id: maxId + 1,
         name: registerData.name,
         email: registerData.email,
-        password: registerData.password
+        password: registerData.password,
+        profilePicture: null
       };
 
       const updatedUsers = [...users, newUser];
@@ -103,10 +146,65 @@ const Profile = () => {
       setIsLoggedIn(true);
       setRegisterData({ name: '', email: '', password: '', confirmPassword: '' });
       
-      // Save to localStorage
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      // Save users and current user to localStorage
+      localStorage.setItem('pokemonUsers', JSON.stringify(updatedUsers));
+      localStorage.setItem('pokemonCurrentUser', JSON.stringify(newUser));
     }
+  };
+
+  const handleProfilePictureChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Check file size (limit to 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size should be less than 5MB');
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = e.target.result;
+        
+        // Update current user
+        const updatedUser = { ...currentUser, profilePicture: imageData };
+        setCurrentUser(updatedUser);
+        
+        // Update users array
+        const updatedUsers = users.map(user => 
+          user.id === currentUser.id ? updatedUser : user
+        );
+        setUsers(updatedUsers);
+        
+        // Save to localStorage
+        localStorage.setItem('pokemonCurrentUser', JSON.stringify(updatedUser));
+        localStorage.setItem('pokemonUsers', JSON.stringify(updatedUsers));
+        
+        setShowProfilePictureModal(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeProfilePicture = () => {
+    const updatedUser = { ...currentUser, profilePicture: null };
+    setCurrentUser(updatedUser);
+    
+    const updatedUsers = users.map(user => 
+      user.id === currentUser.id ? updatedUser : user
+    );
+    setUsers(updatedUsers);
+    
+    // Save to localStorage
+    localStorage.setItem('pokemonCurrentUser', JSON.stringify(updatedUser));
+    localStorage.setItem('pokemonUsers', JSON.stringify(updatedUsers));
+    
+    setShowProfilePictureModal(false);
   };
 
   const handleLogout = () => {
@@ -114,8 +212,9 @@ const Profile = () => {
     setCurrentUser(null);
     setErrors({});
     
-    // Remove from localStorage
-    localStorage.removeItem('currentUser');
+    // Remove current user from localStorage (keep users data)
+    localStorage.removeItem('pokemonCurrentUser');
+
   };
 
   const styles = {
@@ -148,15 +247,40 @@ const Profile = () => {
       alignItems: 'center',
       gap: '16px'
     },
+    avatarContainer: {
+      position: 'relative',
+      cursor: 'pointer'
+    },
     avatar: {
-      width: '64px',
-      height: '64px',
+      width: '80px',
+      height: '80px',
       background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
       borderRadius: '50%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: 'white'
+      color: 'white',
+      overflow: 'hidden',
+      border: '3px solid #e5e7eb'
+    },
+    avatarImage: {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover'
+    },
+    cameraOverlay: {
+      position: 'absolute',
+      bottom: '0',
+      right: '0',
+      backgroundColor: '#3b82f6',
+      borderRadius: '50%',
+      width: '24px',
+      height: '24px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      border: '2px solid white'
     },
     userName: {
       fontSize: '24px',
@@ -182,40 +306,65 @@ const Profile = () => {
       fontWeight: '500',
       transition: 'background-color 0.2s'
     },
-    collectionContainer: {
+    modal: {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      right: '0',
+      bottom: '0',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000
+    },
+    modalContent: {
       backgroundColor: 'white',
       borderRadius: '12px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      padding: '24px'
+      padding: '24px',
+      maxWidth: '400px',
+      width: '90%',
+      boxShadow: '0 20px 25px rgba(0, 0, 0, 0.1)'
     },
-    collectionTitle: {
+    modalTitle: {
       fontSize: '20px',
       fontWeight: 'bold',
-      color: '#1f2937',
-      marginBottom: '16px'
+      marginBottom: '16px',
+      textAlign: 'center',
+      color: '#1f2937'
     },
-    cardGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-      gap: '16px'
+    modalButtons: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px'
     },
-    card: {
-      background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-      padding: '16px',
+    modalBtn: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px',
+      padding: '12px 16px',
+      border: 'none',
       borderRadius: '8px',
-      border: '2px solid #f59e0b',
-      transition: 'transform 0.2s'
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      transition: 'background-color 0.2s'
     },
-    cardName: {
-      fontSize: '18px',
-      fontWeight: 'bold',
-      color: '#1f2937',
-      margin: '0 0 8px 0'
+    uploadBtn: {
+      backgroundColor: '#3b82f6',
+      color: 'white'
     },
-    cardDetail: {
-      color: '#4b5563',
-      margin: '4px 0',
-      fontSize: '14px'
+    removeBtn: {
+      backgroundColor: '#ef4444',
+      color: 'white'
+    },
+    cancelBtn: {
+      backgroundColor: '#6b7280',
+      color: 'white'
+    },
+    hiddenInput: {
+      display: 'none'
     },
     authContainer: {
       minHeight: '100vh',
@@ -342,6 +491,23 @@ const Profile = () => {
       marginTop: '16px',
       color: '#6b7280',
       fontSize: '14px'
+    },
+    contentArea: {
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      padding: '24px',
+      textAlign: 'center'
+    },
+    contentTitle: {
+      fontSize: '20px',
+      fontWeight: 'bold',
+      color: '#1f2937',
+      marginBottom: '16px'
+    },
+    contentText: {
+      color: '#6b7280',
+      lineHeight: 1.6
     }
   };
 
@@ -353,8 +519,24 @@ const Profile = () => {
           <div style={styles.header}>
             <div style={styles.headerContent}>
               <div style={styles.userInfo}>
-                <div style={styles.avatar}>
-                  <User size={32} />
+                <div 
+                  style={styles.avatarContainer}
+                  onClick={() => setShowProfilePictureModal(true)}
+                >
+                  <div style={styles.avatar}>
+                    {currentUser.profilePicture ? (
+                      <img 
+                        src={currentUser.profilePicture} 
+                        alt="Profile" 
+                        style={styles.avatarImage}
+                      />
+                    ) : (
+                      <User size={32} />
+                    )}
+                  </div>
+                  <div style={styles.cameraOverlay}>
+                    <Camera size={12} />
+                  </div>
                 </div>
                 <div>
                   <h1 style={styles.userName}>Welcome, {currentUser.name}!</h1>
@@ -373,9 +555,60 @@ const Profile = () => {
             </div>
           </div>
 
-          
-          
+          {/* Main Content Area */}
+          <div style={styles.contentArea}>
+            <h2 style={styles.contentTitle}>Your Pokemon Collection</h2>
+            <p style={styles.contentText}>
+              Welcome to your profile! Click on your profile picture above to upload a custom image.
+              Your profile picture will be saved and restored when you log in again.
+            </p>
+          </div>
         </div>
+
+        {/* Profile Picture Modal */}
+        {showProfilePictureModal && (
+          <div style={styles.modal} onClick={() => setShowProfilePictureModal(false)}>
+            <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <h3 style={styles.modalTitle}>Update Profile Picture</h3>
+              <div style={styles.modalButtons}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePictureChange}
+                  style={styles.hiddenInput}
+                  id="profile-picture-input"
+                />
+                <button
+                  onClick={() => document.getElementById('profile-picture-input').click()}
+                  style={{...styles.modalBtn, ...styles.uploadBtn}}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                >
+                  <Upload size={16} />
+                  Upload New Picture
+                </button>
+                {currentUser.profilePicture && (
+                  <button
+                    onClick={removeProfilePicture}
+                    style={{...styles.modalBtn, ...styles.removeBtn}}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
+                  >
+                    Remove Picture
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowProfilePictureModal(false)}
+                  style={{...styles.modalBtn, ...styles.cancelBtn}}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#4b5563'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#6b7280'}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
