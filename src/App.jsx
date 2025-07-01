@@ -86,43 +86,7 @@ function App() {
   );
 }
 
-function Modal({ card, onClose }) {
-  // Only show 30 day average price if available
-  const price30Day = card.tcgplayer?.prices?.holofoil?.market
-    ? card.tcgplayer.prices.holofoil.market // fallback to market if 30 day avg not available
-    : null;
-
-  // Sometimes 30 day average price is in card.tcgplayer.prices.holofoil['30day']
-  // If your sdk provides a specific 30-day average price key, adjust here.
-
-  // Based on your screenshot, let's assume 30 day average is:
-  const price30DayAverage = card.tcgplayer?.prices?.holofoil?.market || 'N/A';
-
-  return (
-    <div style={modalStyles.overlay}>
-      <div style={modalStyles.modal}>
-        <button onClick={onClose} style={modalStyles.closeButton}>X</button>
-        <h2>{card.name}</h2>
-        <img src={card.images.large || card.images.small} alt={card.name} style={{ maxWidth: '200px' }} />
-
-                <h3>30 Day Average Price: {price30DayAverage ? `$${price30DayAverage}` : 'N/A'}</h3>
-        
-        <p><strong>Rarity:</strong> {card.rarity || 'N/A'}</p>
-
-        <h3>Weakness</h3>
-        {card.weaknesses ? card.weaknesses.map((w, idx) => (
-          <p key={idx}>{w.type} ×{w.value}</p>
-        )) : <p>N/A</p>}
-
-        <h3>Resistance</h3>
-        {card.resistances ? card.resistances.map((r, idx) => (
-          <p key={idx}>{r.type} {r.value}</p>
-        )) : <p>N/A</p>}
-      </div>
-    </div>
-  );
-}
-
+// Put modalStyles outside Modal so it’s in scope
 const modalStyles = {
   overlay: {
     position: 'fixed',
@@ -156,5 +120,84 @@ const modalStyles = {
     cursor: 'pointer',
   },
 };
+
+function Modal({ card, onClose }) {
+  const [favorites, setFavorites] = useState(() => {
+    const fav = localStorage.getItem('favorites');
+    return fav ? JSON.parse(fav) : [];
+  });
+  const [collected, setCollected] = useState(() => {
+    const coll = localStorage.getItem('collected');
+    return coll ? JSON.parse(coll) : [];
+  });
+
+  const isFavorite = favorites.some(c => c.id === card.id);
+  const isCollected = collected.some(c => c.id === card.id);
+
+  const toggleFavorite = () => {
+    let updatedFav;
+    if (isFavorite) {
+      updatedFav = favorites.filter(c => c.id !== card.id);
+    } else {
+      updatedFav = [...favorites, card];
+    }
+    setFavorites(updatedFav);
+    localStorage.setItem('favorites', JSON.stringify(updatedFav));
+  };
+
+  const toggleCollected = () => {
+    let updatedCollected;
+    if (isCollected) {
+      updatedCollected = collected.filter(c => c.id !== card.id);
+    } else {
+      updatedCollected = [...collected, card];
+    }
+    setCollected(updatedCollected);
+    localStorage.setItem('collected', JSON.stringify(updatedCollected));
+  };
+
+  const price30DayAverage = card.tcgplayer?.prices?.holofoil?.market || 'N/A';
+
+  return (
+    <div style={modalStyles.overlay}>
+      <div style={modalStyles.modal}>
+        <button onClick={onClose} style={modalStyles.closeButton}>X</button>
+        <h2>{card.name}</h2>
+        <img src={card.images.large || card.images.small} alt={card.name} style={{ maxWidth: '200px' }} />
+
+        <h3>30 Day Average Price: {price30DayAverage ? `$${price30DayAverage}` : 'N/A'}</h3>
+
+        <p><strong>Rarity:</strong> {card.rarity || 'N/A'}</p>
+
+        <h3>Weakness</h3>
+        {card.weaknesses ? card.weaknesses.map((w, idx) => (
+          <p key={idx}>{w.type} ×{w.value}</p>
+        )) : <p>N/A</p>}
+
+        <h3>Resistance</h3>
+        {card.resistances ? card.resistances.map((r, idx) => (
+          <p key={idx}>{r.type} {r.value}</p>
+        )) : <p>N/A</p>}
+
+        {/* Toggle Buttons */}
+        <div style={{ marginTop: '20px' }}>
+          <button
+            onClick={toggleFavorite}
+            style={{ marginRight: '10px', padding: '8px', cursor: 'pointer' }}
+          >
+            {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+          </button>
+
+          <button
+            onClick={toggleCollected}
+            style={{ padding: '8px', cursor: 'pointer' }}
+          >
+            {isCollected ? 'Remove from Collected' : 'Add to Collected'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default App;
