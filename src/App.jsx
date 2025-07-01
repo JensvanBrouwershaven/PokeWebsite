@@ -1,25 +1,35 @@
-import './App.css';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Profiel from './pages/Profiel.jsx'; // updated path to reflect it's a page
+// In App.js
+import { useEffect, useState } from 'react';
 
 function App() {
-  return (
-    <Router>
-      <div className="App">
-        {/* Optional Nav */}
-        <nav className="p-4 bg-gray-800 text-white">
-          <Link to="/profiel" className="hover:underline">
-            Ga naar Profielpagina
-          </Link>
-        </nav>
+  const [cards, setCards] = useState([]);
 
-        {/* Routes */}
-        <Routes>
-          <Route path="/profiel" element={<Profiel />} />
-          {/* More routes like home, login, etc. can go here */}
-        </Routes>
-      </div>
-    </Router>
+ useEffect(() => {
+  fetch('https://api.pokemontcg.io/v2/cards?pageSize=250', {
+    headers: {
+      'X-Api-Key': 'your-api-key-here'
+    }
+  })
+    .then(res => res.json())
+    .then(data => setCards(data.data))
+    .catch(err => console.error(err));
+}, []);
+
+
+  return (
+    <div>
+      {cards.length === 0 ? (
+        <p>Loading...</p>
+      ) : (
+        <ul>
+          {cards.map(card => (
+            <li key={card.id}>
+              <img src={card.images.small} alt={card.name} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 
