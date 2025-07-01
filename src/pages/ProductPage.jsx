@@ -15,21 +15,32 @@ function Cards() {
   const [selectedCard, setSelectedCard] = useState(null);
 
   useEffect(() => {
-    const buildQuery = () => {
-      const queryParts = [];
+   const buildQuery = () => {
+  const queryParts = [];
 
-      if (searchText.trim() !== '') {
-        queryParts.push(`name:${searchText.trim()}*`);
-      }
-      if (filters.types.length > 0)
-        queryParts.push(`types:${filters.types.join('|')}`);
-      if (filters.rarities.length > 0)
-        queryParts.push(`rarity:${filters.rarities.join('|')}`);
-      if (filters.series.length > 0)
-        queryParts.push(`set.series:${filters.series.join('|')}`);
+  if (searchText.trim() !== '') {
+    queryParts.push(`name:${searchText.trim()}*`);
+  }
+  if (filters.types.length > 0)
+    queryParts.push(`types:${filters.types.join('|')}`);
 
-      return queryParts.join(' ');
-    };
+  if (filters.rarities.length > 0) {
+    const quotedRarities = filters.rarities
+      .map(r => (r.includes(' ') ? `"${r}"` : r))
+      .join('|');
+    queryParts.push(`rarity:${quotedRarities}`);
+  }
+
+  if (filters.series.length > 0) {
+    const quotedSeries = filters.series
+      .map(s => (s.includes(' ') ? `"${s}"` : s))
+      .join('|');
+    queryParts.push(`set.series:${quotedSeries}`);
+  }
+
+  return queryParts.join(' ');
+};
+
 
     const query = buildQuery();
 
