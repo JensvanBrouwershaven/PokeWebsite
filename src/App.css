@@ -3,6 +3,27 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+      
+}
+p{
+font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+}
+h1{
+font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+}
+input{
+font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+}
+a{
+font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+}
+small{
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
 }
 .FlexboxProductPageNav{
     display: flex;

@@ -50,6 +50,8 @@ const Nav = ({ children }) => {
           color: white;
           text-decoration: none;
           font-size: 16px;
+          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
         }
 
         .center-circle {
@@ -110,11 +112,11 @@ const Nav = ({ children }) => {
           border-bottom-left-radius: 60px;
           border-bottom-right-radius: 60px;
           border-top: none;
-          margin: 0 auto;
+          margin: 0 auto -1rem auto;
         }
 
         .footer-content {
-          padding: 10px 40px 20px 40px;
+          padding: 0px 40px 20px 40px;
           font-size: 14px;
           display: flex;
           justify-content: space-between;
@@ -125,6 +127,8 @@ const Nav = ({ children }) => {
           display: inline-block;
           color: #333;
           text-decoration: none;
+          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
         }
 
         .footer-content a:hover {
@@ -157,7 +161,7 @@ const Nav = ({ children }) => {
         <div className="footer-ball"></div>
         <div className="footer-content">
           <p>© 2025 PokéKaartjes</p>
-          <a href="#">Veel gestelde vragen</a>
+          <Link to="/Faq">Veel Gestelde Vragen</Link>
         </div>
       </div>
     </>

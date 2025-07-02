@@ -410,7 +410,7 @@ const openModal = (card) => setSelectedCard(card);
       display: "none",
     },
     authContainer: {
-      minHeight: "100vh",
+      minHeight: "85vh",
       background: "linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 100%)",
       display: "flex",
       alignItems: "center",
