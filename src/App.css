@@ -145,3 +145,8 @@ small{
   margin: 5px 0;
   color: white;
 }
+
+.card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* Pokémon yellow glow */
+}
