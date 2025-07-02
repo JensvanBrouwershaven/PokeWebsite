@@ -46,7 +46,15 @@ function Cards() {
 
     pokemon.card
       .where({ q: query, pageSize: 250 })
-      .then((response) => setCards(response.data || []))
+      .then((response) => {
+  const sorted = (response.data || []).sort((a, b) => {
+    const numA = a.nationalPokedexNumbers?.[0] ?? Infinity;
+    const numB = b.nationalPokedexNumbers?.[0] ?? Infinity;
+    return numA - numB;
+  });
+  setCards(sorted);
+})
+
       .catch((err) => {
         console.error("Failed to fetch cards", err);
         setCards([]);
