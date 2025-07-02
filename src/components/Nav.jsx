@@ -1,13 +1,23 @@
 import logo from '../img/logo.png';
 
-const Nav = () => {
+const Nav = ({ children }) => {
   return (
     <>
       <style>{`
+        /* ...alle styles blijven hetzelfde... */
         body, html {
           margin: 0;
           padding: 0;
           height: 100%;
+        }
+
+        /* voeg hier de grijze achtergrond toe */
+        .app-wrapper {
+          background-color: #bcbcbc;
+          min-height: 100vh;
+          padding-top: 80px; /* ruimte voor fixed nav */
+          padding-bottom: 62px; /* ruimte voor fixed footer */
+          box-sizing: border-box;
         }
 
         /* --- NAVIGATION BAR --- */
@@ -44,7 +54,7 @@ const Nav = () => {
 
         .center-circle {
           position: absolute;
-          bottom: -30px;
+          bottom: -40px;
           left: 50%;
           transform: translateX(-50%);
           background: white;
@@ -66,9 +76,8 @@ const Nav = () => {
           border-radius: 50%;
         }
 
-        /* --- ZWARTE LIJNEN --- */
         .nav-border {
-          height: 6px;
+          height: 10px;
           background-color: black;
           position: fixed;
           top: 80px;
@@ -122,15 +131,8 @@ const Nav = () => {
         .footer-content a:hover {
           text-decoration: underline;
         }
-
-        /* --- LEGE RUIMTE TUSSEN NAV EN FOOTER --- */
-        .spacer {
-          height: calc(100vh - 80px - 62px); /* 80px nav + 62px footer approx */
-          background-color: #f9f9f9; /* of wat je maar wil */
-        }
       `}</style>
 
-      {/* --- NAVBAR --- */}
       <nav className="pokeball-nav">
         <div className="nav-left">
           <img src={logo} alt="Logo" />
@@ -144,13 +146,13 @@ const Nav = () => {
         </div>
       </nav>
 
-      {/* --- ZWARTE LIJN ONDER NAV --- */}
       <div className="nav-border"></div>
 
-      {/* --- LEGE RUIMTE TUSSEN NAV EN FOOTER --- */}
-      <div className="spacer"></div>
+      {/* Dit is de container met grijze achtergrond en ruimte voor fixed nav/footer */}
+      <div className="app-wrapper">
+        {children}
+      </div>
 
-      {/* --- FOOTER --- */}
       <div className="footer">
         <div className="footer-line"></div>
         <div className="footer-ball"></div>
