@@ -114,6 +114,8 @@ const modalStyles = {
     zIndex: 1000,
   },
   modal: {
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: '#222',
     color: 'white',
     padding: '20px',
@@ -123,6 +125,8 @@ const modalStyles = {
     maxHeight: '80vh',
     overflowY: 'auto',
     position: 'relative',
+    justifyContent: "center",
+    alignItems: 'center',
   },
   closeButton: {
     position: 'absolute',
