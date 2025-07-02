@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Filters from '../components/Filter';
 import pokemon from '../components/Api'; // your configured sdk instance
+import '../App.css'
 
 function Cards() {
   const [cards, setCards] = useState([]);
@@ -61,16 +62,20 @@ function Cards() {
   };
 
   return (
-    <div>
-      <h1>Pokémon TCG Browser</h1>
+    <div className="FlexboxProductPageNav">
+      <div className='filterbarDiv' >
+        <div className='SearchBarDiv'>
       <input
         type="text"
         placeholder="Search cards by name"
         value={searchText}
         onChange={e => setSearchText(e.target.value)}
+      className='SearchBar'
       />
+      </div>
       <Filters filters={filters} setFilters={setFilters} />
-
+</div>
+<div className='mainContent'>
       <div className="card-grid">
         {cards.length === 0 ? (
           <p>No cards found.</p>
@@ -89,7 +94,7 @@ function Cards() {
           ))
         )}
       </div>
-
+</div>
       {selectedCard && (
         <Modal card={selectedCard} onClose={closeModal} />
       )}
