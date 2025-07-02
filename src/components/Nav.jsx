@@ -1,5 +1,5 @@
-import logo from '../img/logo.png';
-
+import logo from "../img/logo.png";
+import { Link } from "react-router-dom";
 const Nav = ({ children }) => {
   return (
     <>
@@ -38,7 +38,7 @@ const Nav = ({ children }) => {
         }
 
         .nav-left img {
-          height: 50px;
+          height: 80px;
         }
 
         .nav-right {
@@ -98,7 +98,7 @@ const Nav = ({ children }) => {
         }
 
         .footer-line {
-          height: 6px;
+          height: 10px;
           background-color: black;
         }
 
@@ -114,7 +114,7 @@ const Nav = ({ children }) => {
         }
 
         .footer-content {
-          padding: 20px 40px 30px 40px;
+          padding: 10px 40px 20px 40px;
           font-size: 14px;
           display: flex;
           justify-content: space-between;
@@ -123,7 +123,6 @@ const Nav = ({ children }) => {
 
         .footer-content a {
           display: inline-block;
-          margin-top: 10px;
           color: #333;
           text-decoration: none;
         }
@@ -135,23 +134,23 @@ const Nav = ({ children }) => {
 
       <nav className="pokeball-nav">
         <div className="nav-left">
-          <img src={logo} alt="Logo" />
+          <Link to="/">
+            <img src={logo} alt="Logo" />
+          </Link>
         </div>
         <div className="center-circle">
           <div className="inner-circle"></div>
         </div>
         <div className="nav-right">
-          <a href="#">Kaarten</a>
-          <a href="#">Profiel</a>
+          <Link to="/">Kaarten</Link>
+          <Link to="/profiel">Profiel</Link>
         </div>
       </nav>
 
       <div className="nav-border"></div>
 
       {/* Dit is de container met grijze achtergrond en ruimte voor fixed nav/footer */}
-      <div className="app-wrapper">
-        {children}
-      </div>
+      <div className="app-wrapper">{children}</div>
 
       <div className="footer">
         <div className="footer-line"></div>
