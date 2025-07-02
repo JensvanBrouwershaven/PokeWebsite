@@ -583,7 +583,6 @@ const Profile = () => {
       gap: "16px",
     },
     card: {
-      backgroundColor: "#f9fafb",
       borderRadius: "8px",
       padding: "12px",
       textAlign: "center",
@@ -591,7 +590,15 @@ const Profile = () => {
       transition: "transform 0.2s, box-shadow 0.2s",
       border: "2px solid transparent",
     },
-    cardImage: {
+// Separate card styles for favorites and collected
+    favoriteCard: {
+      backgroundColor: "#fef3c7", // Same as favorites title background
+      border: "2px solid #f59e0b",
+    },
+    collectedCard: {
+      backgroundColor: "#d1fae5", // Same as collected title background
+      border: "2px solid #10b981",
+    },    cardImage: {
       width: "100%",
       height: "auto",
       borderRadius: "4px",
@@ -657,7 +664,7 @@ const Profile = () => {
       cursor: "pointer",
     },
   };
-  
+
   if (isLoggedIn && currentUser) {
     return (
       <div style={styles.container}>
@@ -706,12 +713,15 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Main Content Area */}
+        {/* Main Content Area */}
           <div style={styles.contentArea}>
             <h2 style={styles.contentTitle}>Your Pokemon Collection</h2>
             
 
             <div style={styles.collectionsContainer}>
+              {/* Divider line between sections */}
+              <div style={styles.dividerLine}></div>
+              
               {/* Favorites Section */}
               <div style={styles.collectionSection}>
                 <h3 style={{...styles.sectionTitle, ...styles.favoritesTitle}}>
@@ -722,17 +732,17 @@ const Profile = () => {
                     favorites.map((card) => (
                       <div
                         key={`fav-${card.id}`}
-                        style={styles.card}
+                        style={{...styles.card, ...styles.favoriteCard}}
                         onClick={() => openModal(card)}
                         onMouseEnter={(e) => {
                           e.target.style.transform = "translateY(-2px)";
                           e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
-                          e.target.style.borderColor = "#fbbf24";
+                          e.target.style.borderColor = "#d97706";
                         }}
                         onMouseLeave={(e) => {
                           e.target.style.transform = "translateY(0)";
                           e.target.style.boxShadow = "none";
-                          e.target.style.borderColor = "transparent";
+                          e.target.style.borderColor = "#f59e0b";
                         }}
                       >
                         <img 
@@ -762,17 +772,17 @@ const Profile = () => {
                     collected.map((card) => (
                       <div
                         key={`coll-${card.id}`}
-                        style={styles.card}
+                        style={{...styles.card, ...styles.collectedCard}}
                         onClick={() => openModal(card)}
                         onMouseEnter={(e) => {
                           e.target.style.transform = "translateY(-2px)";
                           e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
-                          e.target.style.borderColor = "#10b981";
+                          e.target.style.borderColor = "#047857";
                         }}
                         onMouseLeave={(e) => {
                           e.target.style.transform = "translateY(0)";
                           e.target.style.boxShadow = "none";
-                          e.target.style.borderColor = "transparent";
+                          e.target.style.borderColor = "#10b981";
                         }}
                       >
                         <img 
