@@ -18,11 +18,11 @@ const Profile = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
   const [favorites, setFavorites] = useState([]);
-const [collected, setCollected] = useState([]);
-const [selectedCard, setSelectedCard] = useState(null);
+  const [collected, setCollected] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(null);
 
-const openModal = (card) => setSelectedCard(card);
-
+  const openModal = (card) => setSelectedCard(card);
+  const closeModal = () => setSelectedCard(null);
 
   // Form states
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -250,20 +250,17 @@ const openModal = (card) => setSelectedCard(card);
     localStorage.removeItem("pokemonCurrentUser");
   };
 
- 
   useEffect(() => {
-    let test = localStorage.getItem("favorites");
-    if (test) {
-      setFavorites(JSON.parse(test)); // Parse de JSON string naar array
-    }
-  }, []); // Lege dependency array - draait alleen bij mount
+    const fav = localStorage.getItem("favorites");
+    if (fav) setFavorites(JSON.parse(fav));
 
-  console.log("dit is de laatste", favorites); // Gebruik comma, niet +
+    const coll = localStorage.getItem("collected");
+    if (coll) setCollected(JSON.parse(coll));
+  }, []);
 
   const styles = {
     container: {
       minHeight: "100vh",
-      background: "linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 100%)",
       padding: "16px",
       fontFamily: "Arial, sans-serif",
     },
@@ -540,20 +537,127 @@ const openModal = (card) => setSelectedCard(card);
       borderRadius: "12px",
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
       padding: "24px",
-      textAlign: "center",
     },
     contentTitle: {
       fontSize: "20px",
       fontWeight: "bold",
       color: "#1f2937",
       marginBottom: "16px",
+      textAlign: "center",
     },
     contentText: {
       color: "#6b7280",
       lineHeight: 1.6,
+      textAlign: "center",
+      marginBottom: "24px",
+    },
+    collectionsContainer: {
+      display: "flex",
+      gap: "24px",
+      flexWrap: "wrap",
+    },
+    collectionSection: {
+      flex: 1,
+      minWidth: "300px",
+    },
+    sectionTitle: {
+      fontSize: "18px",
+      fontWeight: "bold",
+      color: "#1f2937",
+      marginBottom: "16px",
+      textAlign: "center",
+      padding: "12px",
+      borderRadius: "8px",
+    },
+    favoritesTitle: {
+      backgroundColor: "#fef3c7",
+      color: "#92400e",
+    },
+    collectedTitle: {
+      backgroundColor: "#d1fae5",
+      color: "#065f46",
+    },
+    cardGrid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+      gap: "16px",
+    },
+    card: {
+      backgroundColor: "#f9fafb",
+      borderRadius: "8px",
+      padding: "12px",
+      textAlign: "center",
+      cursor: "pointer",
+      transition: "transform 0.2s, box-shadow 0.2s",
+      border: "2px solid transparent",
+    },
+    cardImage: {
+      width: "100%",
+      height: "auto",
+      borderRadius: "4px",
+      marginBottom: "8px",
+    },
+    cardName: {
+      fontSize: "14px",
+      fontWeight: "bold",
+      color: "#1f2937",
+      margin: "0 0 4px 0",
+    },
+    cardRarity: {
+      fontSize: "12px",
+      color: "#6b7280",
+      margin: 0,
+    },
+    emptyState: {
+      textAlign: "center",
+      color: "#9ca3af",
+      fontStyle: "italic",
+      padding: "20px",
     },
   };
 
+  // Put modalStyles outside Modal so it's in scope
+  const modalStyles = {
+    overlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0,0,0,0.7)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 1000,
+    },
+    modal: {
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: "#222",
+      color: "white",
+      padding: "20px",
+      borderRadius: "8px",
+      maxWidth: "500px",
+      width: "90%",
+      maxHeight: "80vh",
+      overflowY: "auto",
+      position: "relative",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    closeButton: {
+      position: "absolute",
+      right: 10,
+      top: 10,
+      background: "red",
+      color: "white",
+      border: "none",
+      borderRadius: "4px",
+      padding: "5px 10px",
+      cursor: "pointer",
+    },
+  };
+  
   if (isLoggedIn && currentUser) {
     return (
       <div style={styles.container}>
@@ -605,29 +709,111 @@ const openModal = (card) => setSelectedCard(card);
           {/* Main Content Area */}
           <div style={styles.contentArea}>
             <h2 style={styles.contentTitle}>Your Pokemon Collection</h2>
-            <p style={styles.contentText}>
-              Welcome to your profile! Click on your profile picture above to
-              upload a custom image. Your profile picture will be saved and
-              restored when you log in again.
-            </p>
             
-            <div className="card-grid">
-  {[...new Map([...favorites, ...collected].map(card => [card.id, card])).values()].map(card => (
-    <div
-      key={card.id}
-      className="card"
-      onClick={() => openModal(card)}
-      style={{ cursor: 'pointer' }}
-    >
-      <img src={card.images.small} alt={card.name} />
-      <p>{card.name}</p>
-      <small>{card.rarity}</small>
-    </div>
-  ))}
-</div>
 
+            <div style={styles.collectionsContainer}>
+              {/* Favorites Section */}
+              <div style={styles.collectionSection}>
+                <h3 style={{...styles.sectionTitle, ...styles.favoritesTitle}}>
+                  ⭐ Favorites ({favorites.length})
+                </h3>
+                <div style={styles.cardGrid}>
+                  {favorites.length > 0 ? (
+                    favorites.map((card) => (
+                      <div
+                        key={`fav-${card.id}`}
+                        style={styles.card}
+                        onClick={() => openModal(card)}
+                        onMouseEnter={(e) => {
+                          e.target.style.transform = "translateY(-2px)";
+                          e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+                          e.target.style.borderColor = "#fbbf24";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = "translateY(0)";
+                          e.target.style.boxShadow = "none";
+                          e.target.style.borderColor = "transparent";
+                        }}
+                      >
+                        <img 
+                          src={card.images.small} 
+                          alt={card.name} 
+                          style={styles.cardImage}
+                        />
+                        <p style={styles.cardName}>{card.name}</p>
+                        <small style={styles.cardRarity}>{card.rarity}</small>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={styles.emptyState}>
+                      No favorite cards yet. Start exploring to add some favorites!
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Collected Section */}
+              <div style={styles.collectionSection}>
+                <h3 style={{...styles.sectionTitle, ...styles.collectedTitle}}>
+                  📦 Collected ({collected.length})
+                </h3>
+                <div style={styles.cardGrid}>
+                  {collected.length > 0 ? (
+                    collected.map((card) => (
+                      <div
+                        key={`coll-${card.id}`}
+                        style={styles.card}
+                        onClick={() => openModal(card)}
+                        onMouseEnter={(e) => {
+                          e.target.style.transform = "translateY(-2px)";
+                          e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+                          e.target.style.borderColor = "#10b981";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = "translateY(0)";
+                          e.target.style.boxShadow = "none";
+                          e.target.style.borderColor = "transparent";
+                        }}
+                      >
+                        <img 
+                          src={card.images.small} 
+                          alt={card.name} 
+                          style={styles.cardImage}
+                        />
+                        <p style={styles.cardName}>{card.name}</p>
+                        <small style={styles.cardRarity}>{card.rarity}</small>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={styles.emptyState}>
+                      No collected cards yet. Start collecting to build your deck!
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Card Detail Modal */}
+        {selectedCard && (
+          <div style={modalStyles.overlay} onClick={closeModal}>
+            <div style={modalStyles.modal} onClick={(e) => e.stopPropagation()}>
+              <button style={modalStyles.closeButton} onClick={closeModal}>
+                ✕
+              </button>
+              <img 
+                src={selectedCard.images.large} 
+                alt={selectedCard.name}
+                style={{ maxWidth: "100%", maxHeight: "70vh", objectFit: "contain" }}
+              />
+              <h3>{selectedCard.name}</h3>
+              <p>Rarity: {selectedCard.rarity}</p>
+              {selectedCard.hp && <p>HP: {selectedCard.hp}</p>}
+              {selectedCard.types && <p>Type: {selectedCard.types.join(", ")}</p>}
+            </div>
+          </div>
+        )}
 
         {/* Profile Picture Modal */}
         {showProfilePictureModal && (
@@ -735,6 +921,7 @@ const openModal = (card) => setSelectedCard(card);
         {errors.general && (
           <div style={styles.generalError}>{errors.general}</div>
         )}
+
 
         {showLogin ? (
           <div>
