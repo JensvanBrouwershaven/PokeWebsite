@@ -232,21 +232,55 @@ function Modal({ card, onClose }) {
         )}
 
         {/* Toggle Buttons */}
-        <div style={{ marginTop: "20px" }}>
-          <button
-            onClick={toggleFavorite}
-            style={{ marginRight: "10px", padding: "8px", cursor: "pointer" }}
-          >
-            {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-          </button>
+{/* Toggle Buttons */}
+<div style={{ marginTop: "20px", display: "flex", gap: "12px" }}>
+  <button
+    onClick={toggleFavorite}
+    style={{
+      padding: "10px 16px",
+      cursor: "pointer",
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      backgroundColor: isFavorite ? "#fcd34d" : "#fef3c7",
+      border: "none",
+      borderRadius: "6px",
+      color: "#1f2937",
+      fontWeight: 600,
+      transition: "all 0.2s ease-in-out",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#fcd34d")}
+    onMouseLeave={(e) =>
+      (e.currentTarget.style.backgroundColor = isFavorite
+        ? "#fcd34d"
+        : "#fef3c7")
+    }
+  >
+    {isFavorite ? "Remove from Favorites" : "Add to Favorites ⭐"}
+  </button>
 
-          <button
-            onClick={toggleCollected}
-            style={{ padding: "8px", cursor: "pointer" }}
-          >
-            {isCollected ? "Remove from Collected" : "Add to Collected"}
-          </button>
-        </div>
+  <button
+    onClick={toggleCollected}
+    style={{
+      padding: "10px 16px",
+      cursor: "pointer",
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      backgroundColor: isCollected ? "#6ee7b7" : "#d1fae5",
+      border: "none",
+      borderRadius: "6px",
+      color: "#065f46",
+      fontWeight: 600,
+      transition: "all 0.2s ease-in-out",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#6ee7b7")}
+    onMouseLeave={(e) =>
+      (e.currentTarget.style.backgroundColor = isCollected
+        ? "#6ee7b7"
+        : "#d1fae5")
+    }
+  >
+    {isCollected ? "Remove from Collected" : "Add to Collected ✅"}
+  </button>
+</div>
+
       </div>
     </div>
   );
