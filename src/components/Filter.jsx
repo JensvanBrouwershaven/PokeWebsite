@@ -73,17 +73,23 @@ export default function Filters({ filters, setFilters }) {
   );
 
   // When openSection changes, animate open or close
-  useEffect(() => {
-    if (openSection && contentRef.current) {
-      // Open animation
-      setIsAnimating(true);
+useEffect(() => {
+  if (openSection && contentRef.current) {
+    setIsAnimating(true);
+    setMaxHeight('0px');
+    requestAnimationFrame(() => {
       setMaxHeight(contentRef.current.scrollHeight + 'px');
-    } else if (contentRef.current) {
-      // Close animation
-      setIsAnimating(true);
+    });
+  } else if (contentRef.current) {
+    setIsAnimating(true);
+    setMaxHeight(contentRef.current.scrollHeight + 'px');
+    requestAnimationFrame(() => {
       setMaxHeight('0px');
-    }
-  }, [openSection]);
+    });
+  }
+}, [openSection]);
+
+
 
   // After animation ends, stop animating to avoid stuck styles
   const handleTransitionEnd = () => {
