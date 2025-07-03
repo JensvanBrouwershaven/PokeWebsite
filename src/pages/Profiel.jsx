@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import {
   User,
   Mail,
@@ -8,6 +8,7 @@ import {
   LogOut,
   Camera,
   Upload,
+  X,
 } from "lucide-react";
 
 const Profile = () => {
@@ -20,9 +21,17 @@ const Profile = () => {
   const [favorites, setFavorites] = useState([]);
   const [collected, setCollected] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [showCardInfo, setShowCardInfo] = useState(false);
 
-  const openModal = (card) => setSelectedCard(card);
-  const closeModal = () => setSelectedCard(null);
+  const openModal = (card) => {
+    setSelectedCard(card);
+    setShowCardInfo(true);
+  };
+  
+  const closeModal = () => {
+    setSelectedCard(null);
+    setShowCardInfo(false);
+  };
 
   // Form states
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -251,11 +260,80 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    const fav = localStorage.getItem("favorites");
-    if (fav) setFavorites(JSON.parse(fav));
+    // Demo data for testing - you can replace this with actual localStorage data
+    const demoFavorites = [
+      {
+        id: "base1-1",
+        name: "Alakazam",
+        rarity: "Rare Holo",
+        images: {
+          small: "https://images.pokemontcg.io/base1/1.png",
+          large: "https://images.pokemontcg.io/base1/1_hires.png"
+        },
+        hp: "80",
+        types: ["Psychic"]
+      },
+      {
+        id: "base1-2",
+        name: "Blastoise",
+        rarity: "Rare Holo",
+        images: {
+          small: "https://images.pokemontcg.io/base1/2.png",
+          large: "https://images.pokemontcg.io/base1/2_hires.png"
+        },
+        hp: "100",
+        types: ["Water"]
+      }
+    ];
 
-    const coll = localStorage.getItem("collected");
-    if (coll) setCollected(JSON.parse(coll));
+    const demoCollected = [
+      {
+        id: "base1-3",
+        name: "Chansey",
+        rarity: "Rare Holo",
+        images: {
+          small: "https://images.pokemontcg.io/base1/3.png",
+          large: "https://images.pokemontcg.io/base1/3_hires.png"
+        },
+        hp: "120",
+        types: ["Colorless"]
+      },
+      {
+        id: "base1-4",
+        name: "Charizard",
+        rarity: "Rare Holo",
+        images: {
+          small: "https://images.pokemontcg.io/base1/4.png",
+          large: "https://images.pokemontcg.io/base1/4_hires.png"
+        },
+        hp: "120",
+        types: ["Fire"]
+      }
+    ];
+
+    // Try to load from localStorage, otherwise use demo data
+    const savedFavorites = localStorage.getItem("favorites");
+    const savedCollected = localStorage.getItem("collected");
+    
+    if (savedFavorites) {
+      try {
+        setFavorites(JSON.parse(savedFavorites));
+      } catch (error) {
+        setFavorites(demoFavorites);
+      }
+    } else {
+      setFavorites(demoFavorites);
+    }
+
+    if (savedCollected) {
+      try {
+        setCollected(JSON.parse(savedCollected));
+      } catch (error) {
+        setCollected(demoCollected);
+      }
+    } else {
+      setCollected(demoCollected);
+    }
   }, []);
 
   const styles = {
@@ -405,6 +483,68 @@ const Profile = () => {
     },
     hiddenInput: {
       display: "none",
+    },
+    // Card Modal Styles - FIXED
+    cardModalOverlay: {
+      position: "fixed",
+      top: "0",
+      left: "0",
+      right: "0",
+      bottom: "0",
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 2000, // Higher z-index than profile picture modal
+      padding: "16px",
+    },
+    cardModal: {
+      backgroundColor: "white",
+      borderRadius: "16px",
+      padding: "24px",
+      maxWidth: "500px",
+      width: "100%",
+      maxHeight: "90vh",
+      overflowY: "auto",
+      boxShadow: "0 25px 50px rgba(0, 0, 0, 0.25)",
+      position: "relative",
+    },
+    cardModalCloseButton: {
+      position: "absolute",
+      top: "12px",
+      right: "12px",
+      background: "transparent",
+      border: "none",
+      fontSize: "24px",
+      cursor: "pointer",
+      color: "#6b7280",
+      padding: "8px",
+      borderRadius: "50%",
+      width: "40px",
+      height: "40px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "background-color 0.2s",
+    },
+    cardModalImage: {
+      width: "100%",
+      height: "auto",
+      borderRadius: "8px",
+      marginBottom: "16px",
+    },
+    cardModalTitle: {
+      fontSize: "24px",
+      fontWeight: "bold",
+      textAlign: "center",
+      color: "#1f2937",
+      marginBottom: "8px",
+    },
+    cardModalDetail: {
+      textAlign: "center",
+      color: "#6b7280",
+      marginBottom: "4px",
+      fontSize: "16px",
     },
     authContainer: {
       minHeight: "85vh",
@@ -583,14 +723,15 @@ const Profile = () => {
       gap: "16px",
     },
     card: {
-      borderRadius: "8px",
+      borderRadius: "12px",
       padding: "12px",
       textAlign: "center",
       cursor: "pointer",
-      transition: "transform 0.2s, box-shadow 0.2s",
+      transition: "all 0.3s ease",
       border: "2px solid transparent",
+      backdropFilter: "blur(5px)",
     },
-// Separate card styles for favorites and collected
+    // Separate card styles for favorites and collected
     favoriteCard: {
       backgroundColor: "#fef3c7", // Same as favorites title background
       border: "2px solid #f59e0b",
@@ -598,7 +739,8 @@ const Profile = () => {
     collectedCard: {
       backgroundColor: "#d1fae5", // Same as collected title background
       border: "2px solid #10b981",
-    },    cardImage: {
+    },
+    cardImage: {
       width: "100%",
       height: "auto",
       borderRadius: "4px",
@@ -620,48 +762,6 @@ const Profile = () => {
       color: "#9ca3af",
       fontStyle: "italic",
       padding: "20px",
-    },
-  };
-
-  // Put modalStyles outside Modal so it's in scope
-  const modalStyles = {
-    overlay: {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0,0,0,0.7)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 1000,
-    },
-    modal: {
-      display: "flex",
-      flexDirection: "column",
-      backgroundColor: "#222",
-      color: "white",
-      padding: "20px",
-      borderRadius: "8px",
-      maxWidth: "500px",
-      width: "90%",
-      maxHeight: "80vh",
-      overflowY: "auto",
-      position: "relative",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    closeButton: {
-      position: "absolute",
-      right: 10,
-      top: 10,
-      background: "red",
-      color: "white",
-      border: "none",
-      borderRadius: "4px",
-      padding: "5px 10px",
-      cursor: "pointer",
     },
   };
 
@@ -719,9 +819,6 @@ const Profile = () => {
             
 
             <div style={styles.collectionsContainer}>
-              {/* Divider line between sections */}
-              <div style={styles.dividerLine}></div>
-              
               {/* Favorites Section */}
               <div style={styles.collectionSection}>
                 <h3 style={{...styles.sectionTitle, ...styles.favoritesTitle}}>
@@ -805,11 +902,16 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Card Detail Modal */}
+        {/* Card Detail Modal - FIXED: using styles instead of modalStyles */}
         {selectedCard && (
-          <div style={modalStyles.overlay} onClick={closeModal}>
-            <div style={modalStyles.modal} onClick={(e) => e.stopPropagation()}>
-              <button style={modalStyles.closeButton} onClick={closeModal}>
+          <div style={styles.cardModalOverlay} onClick={closeModal}>
+            <div style={styles.cardModal} onClick={(e) => e.stopPropagation()}>
+              <button 
+                style={styles.cardModalCloseButton} 
+                onClick={closeModal}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+              >
                 ✕
               </button>
               <img 
@@ -817,10 +919,10 @@ const Profile = () => {
                 alt={selectedCard.name}
                 style={{ maxWidth: "100%", maxHeight: "70vh", objectFit: "contain" }}
               />
-              <h3>{selectedCard.name}</h3>
-              <p>Rarity: {selectedCard.rarity}</p>
-              {selectedCard.hp && <p>HP: {selectedCard.hp}</p>}
-              {selectedCard.types && <p>Type: {selectedCard.types.join(", ")}</p>}
+              <h3 style={{ textAlign: "center", marginTop: "16px" }}>{selectedCard.name}</h3>
+              <p style={{ textAlign: "center", color: "#6b7280" }}>Rarity: {selectedCard.rarity}</p>
+              {selectedCard.hp && <p style={{ textAlign: "center", color: "#6b7280" }}>HP: {selectedCard.hp}</p>}
+              {selectedCard.types && <p style={{ textAlign: "center", color: "#6b7280" }}>Type: {selectedCard.types.join(", ")}</p>}
             </div>
           </div>
         )}
