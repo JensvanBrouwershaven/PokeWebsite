@@ -148,7 +148,7 @@ const renderSection = (title, group, options) => {
   style={{
     paddingLeft: 15,
     backgroundColor: '#2d2d2d',
-    maxHeight: visible && !isClosing ? '500px' : '0px',
+    maxHeight: visible && !isClosing ? '550px' : '0px',
     overflow: 'hidden',
     transition: 'max-height 0.3s ease, opacity 0.3s ease',
     opacity: visible && !isClosing ? 1 : 0,

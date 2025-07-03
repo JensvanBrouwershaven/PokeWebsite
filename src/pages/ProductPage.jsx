@@ -19,9 +19,10 @@ function Cards() {
     const buildQuery = () => {
       const queryParts = [];
 
-      if (searchText.trim() !== "") {
-        queryParts.push(`name:${searchText.trim()}*`);
-      }
+if (searchText.trim() !== "") {
+  queryParts.push(`name:*${searchText.trim()}*`);
+}
+
       if (filters.types.length > 0)
         queryParts.push(`types:${filters.types.join("|")}`);
 
