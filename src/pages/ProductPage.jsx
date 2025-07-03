@@ -198,6 +198,7 @@ function Modal({ card, onClose }) {
           src={card.images.large || card.images.small}
           alt={card.name}
           style={{ maxWidth: "200px" }}
+          className="ModalImage"
         />
 
         <h3>

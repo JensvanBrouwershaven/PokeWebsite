@@ -45,6 +45,11 @@ small{
   padding: 0 3rem;
   border: 1px solid #ccc;
   outline: none;
+  background-color: #1F1F1F;
+  color: white;
+}
+.ModalImage{
+  border-radius: 10px;
 }
 .SearchBarDiv{
     padding-bottom: 2rem;

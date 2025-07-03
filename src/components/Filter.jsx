@@ -118,38 +118,45 @@ const renderSection = (title, group, options) => {
   return (
     <div style={{ borderBottom: '1px solid #444', marginBottom: 10 }}>
       <button
-        onClick={() => setOpenSection(openSection === group ? null : group)}
-        style={{
-          width: '100%',
-          textAlign: 'left',
-          padding: '10px',
-          fontSize: '1.1em',
-          backgroundColor: '#222',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-          outline: 'none',
-          userSelect: 'none',
-        }}
-      >
-        {title}
-        <span style={{ float: 'right' }}>
-          {openSection === group ? '▾' : '▸'}
-        </span>
-      </button>
+  onClick={() => setOpenSection(openSection === group ? null : group)}
+  style={{
+    width: '100%',
+    textAlign: 'left',
+    padding: '10px 12px',
+    fontSize: '1.05em',
+    backgroundColor: '#1f1f1f',
+    color: '#fff',
+    border: '1px solid #444',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    outline: 'none',
+    userSelect: 'none',
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
+    marginBottom: '4px',
+  }}
+>
+  {title}
+  <span style={{ float: 'right' }}>
+    {openSection === group ? '▾' : '▸'}
+  </span>
+</button>
+
 
       {(visible || isClosing) && (
-        <div
-          ref={containerRef}
-          style={{
-            paddingLeft: 15,
-            backgroundColor: '#333',
-            maxHeight: visible && !isClosing ? '500px' : '0px',
-            overflow: 'hidden',
-            transition: 'max-height 0.3s ease, opacity 0.3s ease',
-            opacity: visible && !isClosing ? 1 : 0,
-          }}
-        >
+<div
+  ref={containerRef}
+  style={{
+    paddingLeft: 15,
+    backgroundColor: '#2d2d2d',
+    maxHeight: visible && !isClosing ? '500px' : '0px',
+    overflow: 'hidden',
+    transition: 'max-height 0.3s ease, opacity 0.3s ease',
+    opacity: visible && !isClosing ? 1 : 0,
+    borderRadius: '4px',
+    marginBottom: '10px',
+  }}
+>
+
           {renderOptions(group, options)}
         </div>
       )}
@@ -158,11 +165,21 @@ const renderSection = (title, group, options) => {
 };
 
 
-  return (
-    <div style={{ width: 250, color: 'white', padding: 10, borderRadius: 6 }}>
-      {renderSection('Types', 'types', types)}
-      {renderSection('Rarity', 'rarities', rarities)}
-      {renderSection('Set', 'series', series)}
-    </div>
-  );
+return (
+  <div
+    style={{
+      width: 250,
+      color: 'white',
+      padding: 10,
+      borderRadius: 8,
+      backgroundColor: '#3a3a3a',
+      boxShadow: '0 0 8px rgba(0,0,0,0.2)',
+    }}
+  >
+    {renderSection('Types', 'types', types)}
+    {renderSection('Rarity', 'rarities', rarities)}
+    {renderSection('Set', 'series', series)}
+  </div>
+);
+
 }
