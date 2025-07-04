@@ -3,23 +3,23 @@ import '../App'
 
 const faqData = [
   {
-    question: 'Waar kan ik mijn verzamelde kaarten en favorieten bekijken?',
+    question: ' Waar kan ik mijn verzamelde kaarten en favorieten bekijken?',
     answer: 'Je kunt je verzamelde kaarten en favorieten bekijken op je profielpagina nadat je een account hebt aangemaakt en ingelogd bent.',
   },
   {
-    question: 'Hoe filter ik kaarten op type, generatie of zeldzaamheid?',
+    question: ' Hoe filter ik kaarten op type, generatie of zeldzaamheid?',
     answer: 'Gebruik de filteropties bovenaan de kaartlijst om kaarten te filteren op type, generatie, zeldzaamheid en serie. Je kunt meerdere filters tegelijk selecteren.',
   },
   {
-    question: 'Hoe kan ik zoeken naar een specifieke kaart?',
+    question: ' Hoe kan ik zoeken naar een specifieke kaart?',
     answer: 'Gebruik de zoekbalk bovenaan om te zoeken op kaartnaam, set of andere kenmerken.',
   },
   {
-    question: 'Is het mogelijk om kaarten toe te voegen aan favorieten?',
+    question: ' Is het mogelijk om kaarten toe te voegen aan favorieten?',
     answer: 'Ja, klik op het hart-icoon op een kaart om deze aan je favorieten toe te voegen.',
   },
   {
-    question: 'Hoe vaak wordt de kaartendatabase bijgewerkt?',
+    question: ' Hoe vaak wordt de kaartendatabase bijgewerkt?',
     answer: 'De database wordt regelmatig bijgewerkt met nieuwe sets en kaarten zodra ze officieel beschikbaar zijn.',
   },
 ];
@@ -57,20 +57,38 @@ const styles = {
     backgroundColor: '#222222',
     borderRadius: '8px',
   },
-  question: {
-    fontWeight: 'bold',
-    fontSize: '1.1rem',
-    cursor: 'pointer',
-    marginBottom: '8px',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+question: {
+  display: 'flex',
+  alignItems: 'center',
+  fontWeight: 'bold',
+  fontSize: '1.1rem',
+  cursor: 'pointer',
+  marginBottom: '8px',
+  fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+},
 
-  },
+
   answer: {
     fontSize: '1rem',
     lineHeight: '1.4',
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
 
   },
+  triangleWrapper: {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '20px', // fixed width to prevent layout shift
+  marginRight: '10px',
+  flexShrink: 0,
+},
+
+triangle: {
+  marginRight: '10px',
+  transition: 'transform 0.2s ease',
+  flexShrink: 0,
+},
+
 };
 
 const Faq = () => {
@@ -99,9 +117,24 @@ const Faq = () => {
       {filteredFaq.length > 0 ? (
         filteredFaq.map(({ question, answer }, index) => (
           <div key={index} style={styles.faqItem}>
-            <div style={styles.question} onClick={() => toggleExpand(index)}>
-              {question}
-            </div>
+<div style={styles.question} onClick={() => toggleExpand(index)}>
+  <svg
+    style={{
+      ...styles.triangle,
+      transform: expandedIndex === index ? 'rotate(90deg)' : 'rotate(0deg)',
+    }}
+    xmlns="http://www.w3.org/2000/svg"
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="white"
+  >
+    <path d="M8 5v14l11-7z" />
+  </svg>
+  {question}
+</div>
+
+
             {expandedIndex === index && <div style={styles.answer}>{answer}</div>}
           </div>
         ))
